@@ -20,8 +20,8 @@ import os
 # 노드 이름
 NODE_NAME = "cv_recognizer"
 
-# 토픽 이름 (3개 입력 / 선로 1, 선로 2, 신호등)
-TOPIC_NAME = ["cv_lane2", "cv_tf", "None"]
+# 발행 토픽 이름 (3개 입력 / 선로 1, 선로 2, 신호등)
+TOPIC_NAME = ["cv_lane_2", "cv_tl", "None"]
 
 # 라벨 이름
 LABEL_NAME = ["lane2", "traffic_light", "None"]
@@ -118,7 +118,7 @@ class cv_recognizer(Node):
 
         # 확률에 대한 내림차순 정렬
         predict = self.predicted[0].boxes[torch.argsort(self.predicted[0].boxes.conf, descending=True)]
-        print(predict.conf)        
+        self.get_logger().info(f"{len(predict.conf.tolist())} object(s) detected | value = {predict.conf.tolist()}")
 
         # Box : 상자 / Keypoint : 관절 표현 / Mask : 영역 표시
         for n, predict in enumerate(predict):
@@ -127,21 +127,26 @@ class cv_recognizer(Node):
             if  name == self.label_0.strip() and cnt_0 == 0:
                 self.msg_0.data = self.predicted[0].masks[n].xy[0].flatten().tolist()
                 self.publisher_0.publish(self.msg_0)
-                self.get_logger().info(f"{self.topic_0} is published [{cnt_0}]")
+                self.get_logger().info(f"{self.topic_0} is published | count = [{cnt_0}]")
                 cnt_0 += 1
             
             elif name == self.label_1.strip() and cnt_1 == 0:
-                self.msg_1.data = self.predicted[0].masks[n].xy[0].flatten().tolist()
+                self.msg_1.data = self.msg_2.data = self.predicted[0].boxes[n].xyxy[0].flatten().tolist()      
                 self.publisher_1.publish(self.msg_1)
-                self.get_logger().info(f"{self.topic_1} is published [{cnt_1}]")
+                self.get_logger().info(f"{self.topic_1} is published | count = [{cnt_1}]")
                 cnt_1 += 1
 
             elif name == self.label_2.strip() and cnt_2 == 0:
                 self.msg_2.data = self.predicted[0].masks[n].xy[0].flatten().tolist()
                 self.publisher_2.publish(self.msg_2)
-                self.get_logger().info(f"{self.topic_2} is published [{cnt_2}]")  
+                self.get_logger().info(f"{self.topic_2} is published | count = [{cnt_2}]")  
                 cnt_2 += 1          
 
+                # Lane 전용
+                # self.msg_2.data = self.predicted[0].masks[n].xy[0].flatten().tolist() 
+
+                # Traffic Light 전용
+                # self.msg_2.data = self.predicted[0].boxes[n].xyxy[0]             
 
     def shutdown(self):
         cv2.destroyAllWindows() # CV 창 닫기

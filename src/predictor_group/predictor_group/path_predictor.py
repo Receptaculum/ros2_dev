@@ -4,15 +4,12 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
 
-import ultralytics
-from ultralytics import YOLO
+from message_filters import Subscriber, ApproximateTimeSynchronizer
 
 import cv2
 import cv_bridge
 
 import torch
-
-import os
 
 
 ## < Parameter> #####################################################################################
@@ -20,17 +17,11 @@ import os
 # 노드 이름
 NODE_NAME = "path_predictor"
 
-# 토픽 이름 (3개 입력 / 선로 1, 선로 2, 신호등)
-TOPIC_NAME = ["cv_lane2", "cv_tf", "None"]
+# 토픽 이름
+TOPIC_NAME = None
 
-# 라벨 이름
-LABEL_NAME = ["lane2", "traffic_light", "None"]
-
-# 구독 토픽 이름
-SUB_TOPIC_NAME = "camera_publisher"
-
-# PT 파일 이름 지정 (확장자 포함)
-PT_NAME = "car.pt"
+# 구독 토픽 이름 (2개)
+SUB_TOPIC_NAME = ["cv_lane_1", "cv_lane_2"]
 
 # CV 처리 영상 출력 여부
 DEBUG = True
@@ -54,3 +45,25 @@ DEBUG = True
 # Liveliness : 활성 상태 감시
 # Deadline : 최소 동작 보장 
 #######################################################################################################
+
+class path_preictor(Node):
+    def __init__(self, node_name, topic_name : list):
+        super().__init__(node_name)
+
+        self.qos_pub = QoSProfile( # Publisher QOS 설정
+                reliability=QoSReliabilityPolicy.RELIABLE,
+                durability=QoSDurabilityPolicy.VOLATILE,
+                history=QoSHistoryPolicy.KEEP_LAST,
+                depth=1
+                )
+
+        self.qos_sub = QoSProfile( # Subscriber QOS 설정
+                reliability=QoSReliabilityPolicy.RELIABLE,
+                durability=QoSDurabilityPolicy.VOLATILE,
+                history=QoSHistoryPolicy.KEEP_LAST,
+                depth=1
+                )
+
+        # Subscriber 선언
+        self.subscriber_0 = Subscriber(self, Float32MultiArray, topic_name[0])
+        self.subscriber_1 = Subscriber(self, Float32MultiArray, topic_name[1])

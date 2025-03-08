@@ -14,6 +14,9 @@ import time
 # 영상 소스
 FRAME_SRC = "/home/user/ros2_dev/src/publisher_group/publisher_group/test.mp4"
 
+# 영상 크기 (가로, 세로)
+FRAME_SIZE = [640, 480]
+
 # 노드 이름
 NODE_NAME = "camera_publisher"
 
@@ -45,10 +48,13 @@ PUBLISH_PERIOD = 0.01
 
 
 class camera_publisher(Node):
-    def __init__(self, frame_src, node_name, topic_name, publish_period):
+    def __init__(self, frame_src, node_name, topic_name, publish_period, frame_size : list):
         super().__init__(node_name)
 
         self.cap = cv2.VideoCapture(frame_src) # 영상 프레임 출력을 위한 Object 변수를 선언
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_size[0]) # 영상 가로 길이 지정
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_size[1]) # 영상 세로 길이 지정
+
         self.node_name = node_name # 노드 이름 저장
 
         self.qos = QoSProfile( # QOS 설정
@@ -80,7 +86,7 @@ class camera_publisher(Node):
 
 def main():
     rclpy.init()
-    camera_publisher_node = camera_publisher(FRAME_SRC, NODE_NAME, TOPIC_NAME, PUBLISH_PERIOD)
+    camera_publisher_node = camera_publisher(FRAME_SRC, NODE_NAME, TOPIC_NAME, PUBLISH_PERIOD, FRAME_SIZE)
     rclpy.spin(camera_publisher_node)
 
     camera_publisher_node.shutdown()
