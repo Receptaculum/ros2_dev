@@ -1,0 +1,13 @@
+package.xml
+setup.cfg
+setup.py
+publisher_group/__init__.py
+publisher_group/camera_publisher.py
+publisher_group.egg-info/PKG-INFO
+publisher_group.egg-info/SOURCES.txt
+publisher_group.egg-info/dependency_links.txt
+publisher_group.egg-info/entry_points.txt
+publisher_group.egg-info/requires.txt
+publisher_group.egg-info/top_level.txt
+publisher_group.egg-info/zip-safe
+resource/publisher_group

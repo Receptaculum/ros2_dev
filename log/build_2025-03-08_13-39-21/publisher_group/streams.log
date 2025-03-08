@@ -1,0 +1,23 @@
+[0.707s] Invoking command in '/home/user/ros2_dev/build/publisher_group': PYTHONPATH=/home/user/ros2_dev/build/publisher_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/publisher_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/publisher_group/build --no-deps symlink_data
+[1.008s] running develop
+[1.139s] running egg_info
+[1.139s] creating publisher_group.egg-info
+[1.139s] writing publisher_group.egg-info/PKG-INFO
+[1.140s] writing dependency_links to publisher_group.egg-info/dependency_links.txt
+[1.140s] writing entry points to publisher_group.egg-info/entry_points.txt
+[1.140s] writing requirements to publisher_group.egg-info/requires.txt
+[1.140s] writing top-level names to publisher_group.egg-info/top_level.txt
+[1.140s] writing manifest file 'publisher_group.egg-info/SOURCES.txt'
+[1.142s] reading manifest file 'publisher_group.egg-info/SOURCES.txt'
+[1.143s] writing manifest file 'publisher_group.egg-info/SOURCES.txt'
+[1.146s] running build_ext
+[1.146s] Creating /home/user/ros2_dev/install/publisher_group/lib/python3.10/site-packages/publisher-group.egg-link (link to .)
+[1.146s] 
+[1.146s] Installed /home/user/ros2_dev/build/publisher_group
+[1.146s] running symlink_data
+[1.146s] creating /home/user/ros2_dev/install/publisher_group/share/ament_index
+[1.146s] creating /home/user/ros2_dev/install/publisher_group/share/ament_index/resource_index
+[1.146s] creating /home/user/ros2_dev/install/publisher_group/share/ament_index/resource_index/packages
+[1.146s] symbolically linking /home/user/ros2_dev/build/publisher_group/resource/publisher_group -> /home/user/ros2_dev/install/publisher_group/share/ament_index/resource_index/packages
+[1.146s] symbolically linking /home/user/ros2_dev/build/publisher_group/package.xml -> /home/user/ros2_dev/install/publisher_group/share/publisher_group
+[1.166s] Invoked command in '/home/user/ros2_dev/build/publisher_group' returned '0': PYTHONPATH=/home/user/ros2_dev/build/publisher_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/publisher_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/publisher_group/build --no-deps symlink_data
