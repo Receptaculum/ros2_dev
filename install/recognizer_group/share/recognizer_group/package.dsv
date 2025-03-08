@@ -1,0 +1,9 @@
+source;share/recognizer_group/hook/pythonpath.ps1
+source;share/recognizer_group/hook/pythonpath.dsv
+source;share/recognizer_group/hook/pythonpath.sh
+source;share/recognizer_group/hook/ament_prefix_path.ps1
+source;share/recognizer_group/hook/ament_prefix_path.dsv
+source;share/recognizer_group/hook/ament_prefix_path.sh
+source;../../build/recognizer_group/share/recognizer_group/hook/pythonpath_develop.ps1
+source;../../build/recognizer_group/share/recognizer_group/hook/pythonpath_develop.dsv
+source;../../build/recognizer_group/share/recognizer_group/hook/pythonpath_develop.sh

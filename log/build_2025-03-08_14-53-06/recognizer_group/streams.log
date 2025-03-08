@@ -1,0 +1,17 @@
+[2.303s] Invoking command in '/home/user/ros2_dev/build/recognizer_group': PYTHONPATH=/home/user/ros2_dev/build/recognizer_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/recognizer_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/recognizer_group/build --no-deps symlink_data
+[2.877s] running develop
+[3.058s] running egg_info
+[3.058s] writing recognizer_group.egg-info/PKG-INFO
+[3.058s] writing dependency_links to recognizer_group.egg-info/dependency_links.txt
+[3.059s] writing entry points to recognizer_group.egg-info/entry_points.txt
+[3.059s] writing requirements to recognizer_group.egg-info/requires.txt
+[3.059s] writing top-level names to recognizer_group.egg-info/top_level.txt
+[3.060s] reading manifest file 'recognizer_group.egg-info/SOURCES.txt'
+[3.061s] writing manifest file 'recognizer_group.egg-info/SOURCES.txt'
+[3.065s] running build_ext
+[3.066s] Creating /home/user/ros2_dev/install/recognizer_group/lib/python3.10/site-packages/recognizer-group.egg-link (link to .)
+[3.066s] Installing recognizer_group script to /home/user/ros2_dev/install/recognizer_group/lib/recognizer_group
+[3.066s] 
+[3.066s] Installed /home/user/ros2_dev/build/recognizer_group
+[3.067s] running symlink_data
+[3.095s] Invoked command in '/home/user/ros2_dev/build/recognizer_group' returned '0': PYTHONPATH=/home/user/ros2_dev/build/recognizer_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/recognizer_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/recognizer_group/build --no-deps symlink_data

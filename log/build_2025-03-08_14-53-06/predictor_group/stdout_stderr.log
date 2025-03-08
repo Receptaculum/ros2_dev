@@ -1,0 +1,14 @@
+running develop
+running egg_info
+writing predictor_group.egg-info/PKG-INFO
+writing dependency_links to predictor_group.egg-info/dependency_links.txt
+writing entry points to predictor_group.egg-info/entry_points.txt
+writing requirements to predictor_group.egg-info/requires.txt
+writing top-level names to predictor_group.egg-info/top_level.txt
+reading manifest file 'predictor_group.egg-info/SOURCES.txt'
+writing manifest file 'predictor_group.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/user/ros2_dev/install/predictor_group/lib/python3.10/site-packages/predictor-group.egg-link (link to .)
+
+Installed /home/user/ros2_dev/build/predictor_group
+running symlink_data

@@ -1,0 +1,16 @@
+[2.224s] Invoking command in '/home/user/ros2_dev/build/decider_group': PYTHONPATH=/home/user/ros2_dev/build/decider_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/decider_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/decider_group/build --no-deps symlink_data
+[3.007s] running develop
+[3.354s] running egg_info
+[3.354s] writing decider_group.egg-info/PKG-INFO
+[3.355s] writing dependency_links to decider_group.egg-info/dependency_links.txt
+[3.355s] writing entry points to decider_group.egg-info/entry_points.txt
+[3.355s] writing requirements to decider_group.egg-info/requires.txt
+[3.355s] writing top-level names to decider_group.egg-info/top_level.txt
+[3.357s] reading manifest file 'decider_group.egg-info/SOURCES.txt'
+[3.358s] writing manifest file 'decider_group.egg-info/SOURCES.txt'
+[3.364s] running build_ext
+[3.364s] Creating /home/user/ros2_dev/install/decider_group/lib/python3.10/site-packages/decider-group.egg-link (link to .)
+[3.365s] 
+[3.365s] Installed /home/user/ros2_dev/build/decider_group
+[3.365s] running symlink_data
+[3.392s] Invoked command in '/home/user/ros2_dev/build/decider_group' returned '0': PYTHONPATH=/home/user/ros2_dev/build/decider_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/decider_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/decider_group/build --no-deps symlink_data

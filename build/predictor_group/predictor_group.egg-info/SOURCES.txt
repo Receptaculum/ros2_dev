@@ -1,0 +1,12 @@
+package.xml
+setup.cfg
+setup.py
+predictor_group/__init__.py
+predictor_group.egg-info/PKG-INFO
+predictor_group.egg-info/SOURCES.txt
+predictor_group.egg-info/dependency_links.txt
+predictor_group.egg-info/entry_points.txt
+predictor_group.egg-info/requires.txt
+predictor_group.egg-info/top_level.txt
+predictor_group.egg-info/zip-safe
+resource/predictor_group

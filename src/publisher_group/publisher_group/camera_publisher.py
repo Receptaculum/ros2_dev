@@ -9,10 +9,10 @@ import cv_bridge
 import time
 
 
-## < Parameter> ###################################################################
+## < Parameter> #####################################################################################
 
 # 영상 소스
-FRAME_SRC = "/dev/video0"
+FRAME_SRC = "/home/user/ros2_dev/src/publisher_group/publisher_group/test.mp4"
 
 # 노드 이름
 NODE_NAME = "camera_publisher"
@@ -33,6 +33,7 @@ PUBLISH_PERIOD = 0.01
 # ERROR	self.get_logger().error("msg")
 # FATAL	self.get_logger().fatal("msg")
 #######################################################################################################
+
 
 ## <QOS> ##############################################################################################
 # Reliability : RELIABLE(신뢰성 보장), BEST_EFFORT(손실 감수, 최대한 빠른 전송)
@@ -66,7 +67,7 @@ class camera_publisher(Node):
 
         if self.ret == True: # 정상
             self.publisher.publish(self.bridge.cv2_to_imgmsg(self.frame))
-            self.get_logger().info("Frame published")
+            self.get_logger().info("frame published")
 
         else: # 오류
             self.get_logger().warn("Unable to read frame") # 오류 출력

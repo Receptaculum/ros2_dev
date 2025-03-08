@@ -1,0 +1,23 @@
+[2.538s] Invoking command in '/home/user/ros2_dev/build/predictor_group': PYTHONPATH=/home/user/ros2_dev/build/predictor_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/predictor_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/predictor_group/build --no-deps symlink_data
+[3.215s] running develop
+[3.362s] running egg_info
+[3.362s] creating predictor_group.egg-info
+[3.362s] writing predictor_group.egg-info/PKG-INFO
+[3.362s] writing dependency_links to predictor_group.egg-info/dependency_links.txt
+[3.362s] writing entry points to predictor_group.egg-info/entry_points.txt
+[3.362s] writing requirements to predictor_group.egg-info/requires.txt
+[3.362s] writing top-level names to predictor_group.egg-info/top_level.txt
+[3.363s] writing manifest file 'predictor_group.egg-info/SOURCES.txt'
+[3.363s] reading manifest file 'predictor_group.egg-info/SOURCES.txt'
+[3.364s] writing manifest file 'predictor_group.egg-info/SOURCES.txt'
+[3.367s] running build_ext
+[3.367s] Creating /home/user/ros2_dev/install/predictor_group/lib/python3.10/site-packages/predictor-group.egg-link (link to .)
+[3.367s] 
+[3.367s] Installed /home/user/ros2_dev/build/predictor_group
+[3.368s] running symlink_data
+[3.368s] creating /home/user/ros2_dev/install/predictor_group/share/ament_index
+[3.368s] creating /home/user/ros2_dev/install/predictor_group/share/ament_index/resource_index
+[3.368s] creating /home/user/ros2_dev/install/predictor_group/share/ament_index/resource_index/packages
+[3.368s] symbolically linking /home/user/ros2_dev/build/predictor_group/resource/predictor_group -> /home/user/ros2_dev/install/predictor_group/share/ament_index/resource_index/packages
+[3.368s] symbolically linking /home/user/ros2_dev/build/predictor_group/package.xml -> /home/user/ros2_dev/install/predictor_group/share/predictor_group
+[3.387s] Invoked command in '/home/user/ros2_dev/build/predictor_group' returned '0': PYTHONPATH=/home/user/ros2_dev/build/predictor_group/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_dev/install/predictor_group/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/user/ros2_dev/build/predictor_group/build --no-deps symlink_data

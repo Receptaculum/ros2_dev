@@ -1,0 +1,12 @@
+package.xml
+setup.cfg
+setup.py
+communicator_group/__init__.py
+communicator_group.egg-info/PKG-INFO
+communicator_group.egg-info/SOURCES.txt
+communicator_group.egg-info/dependency_links.txt
+communicator_group.egg-info/entry_points.txt
+communicator_group.egg-info/requires.txt
+communicator_group.egg-info/top_level.txt
+communicator_group.egg-info/zip-safe
+resource/communicator_group

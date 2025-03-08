@@ -1,0 +1,3 @@
+[console_scripts]
+cv_recognizer = recognizer_group.cv_recognizer:main
+

@@ -1,0 +1,21 @@
+running develop
+running egg_info
+creating decider_group.egg-info
+writing decider_group.egg-info/PKG-INFO
+writing dependency_links to decider_group.egg-info/dependency_links.txt
+writing entry points to decider_group.egg-info/entry_points.txt
+writing requirements to decider_group.egg-info/requires.txt
+writing top-level names to decider_group.egg-info/top_level.txt
+writing manifest file 'decider_group.egg-info/SOURCES.txt'
+reading manifest file 'decider_group.egg-info/SOURCES.txt'
+writing manifest file 'decider_group.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/user/ros2_dev/install/decider_group/lib/python3.10/site-packages/decider-group.egg-link (link to .)
+
+Installed /home/user/ros2_dev/build/decider_group
+running symlink_data
+creating /home/user/ros2_dev/install/decider_group/share/ament_index
+creating /home/user/ros2_dev/install/decider_group/share/ament_index/resource_index
+creating /home/user/ros2_dev/install/decider_group/share/ament_index/resource_index/packages
+symbolically linking /home/user/ros2_dev/build/decider_group/resource/decider_group -> /home/user/ros2_dev/install/decider_group/share/ament_index/resource_index/packages
+symbolically linking /home/user/ros2_dev/build/decider_group/package.xml -> /home/user/ros2_dev/install/decider_group/share/decider_group

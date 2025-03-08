@@ -1,0 +1,9 @@
+source;share/decider_group/hook/pythonpath.ps1
+source;share/decider_group/hook/pythonpath.dsv
+source;share/decider_group/hook/pythonpath.sh
+source;share/decider_group/hook/ament_prefix_path.ps1
+source;share/decider_group/hook/ament_prefix_path.dsv
+source;share/decider_group/hook/ament_prefix_path.sh
+source;../../build/decider_group/share/decider_group/hook/pythonpath_develop.ps1
+source;../../build/decider_group/share/decider_group/hook/pythonpath_develop.dsv
+source;../../build/decider_group/share/decider_group/hook/pythonpath_develop.sh

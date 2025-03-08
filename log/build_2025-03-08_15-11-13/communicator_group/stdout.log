@@ -1,0 +1,14 @@
+running develop
+running egg_info
+writing communicator_group.egg-info/PKG-INFO
+writing dependency_links to communicator_group.egg-info/dependency_links.txt
+writing entry points to communicator_group.egg-info/entry_points.txt
+writing requirements to communicator_group.egg-info/requires.txt
+writing top-level names to communicator_group.egg-info/top_level.txt
+reading manifest file 'communicator_group.egg-info/SOURCES.txt'
+writing manifest file 'communicator_group.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/user/ros2_dev/install/communicator_group/lib/python3.10/site-packages/communicator-group.egg-link (link to .)
+
+Installed /home/user/ros2_dev/build/communicator_group
+running symlink_data

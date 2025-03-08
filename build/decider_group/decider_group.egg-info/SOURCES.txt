@@ -1,0 +1,12 @@
+package.xml
+setup.cfg
+setup.py
+decider_group/__init__.py
+decider_group.egg-info/PKG-INFO
+decider_group.egg-info/SOURCES.txt
+decider_group.egg-info/dependency_links.txt
+decider_group.egg-info/entry_points.txt
+decider_group.egg-info/requires.txt
+decider_group.egg-info/top_level.txt
+decider_group.egg-info/zip-safe
+resource/decider_group
