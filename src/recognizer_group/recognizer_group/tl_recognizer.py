@@ -17,7 +17,7 @@ import numpy as np
 import os
 
 
-## < Parameter> #####################################################################################
+## < Parameter > #####################################################################################
 
 # 노드 이름
 NODE_NAME = "tl_recognizer"
@@ -33,6 +33,15 @@ FRAME_SIZE = [640, 480]
 
 # CV 처리 영상 출력 여부
 DEBUG = True
+
+######################################################################################################
+
+## <색상 코드> #########################################################################################
+# HSV 기준 (0~179, 0~255, 0~255)
+R_RANGE = [[[0, 20], [160, 179]], [[100, 255]], [[100, 255]]]
+Y_RANGE = [[[25, 40]], [[100, 255]], [[100, 255]]]
+G_RANGE = [[[45, 85]], [[8, 255]], [[100, 255]]]
+
 
 ######################################################################################################
 
@@ -84,26 +93,47 @@ class tl_recognizer(Node):
     def frame_callback(self, msg):
         self.img = np.array(msg.data).reshape([self.frame_size[1], self.frame_size[0], -1])
 
+        try:
+            self.img_cropped = self.img[self.y1 : self.y1 + self.h, self.x1 : self.x1 + self.w]
+
+            self.r_sig, self.y_sig, self.g_sig = self.img_splitter(self.img_cropped, self.w)
+            self.cnt_r = self.color_detector(self.r_sig)['R']
+            self.cnt_y = self.color_detector(self.y_sig)['Y']
+            self.cnt_g = self.color_detector(self.g_sig)['G']
+
+            self.cnt = [self.cnt_r, self.cnt_y, self.cnt_g]
+
+            self.num = self.cnt.index(max(self.cnt))
+
+            if self.num == 0 and self.cnt[self.num] > 0.004:
+                self.state = "R"
+
+            elif self.num == 1  and self.cnt[self.num] > 0.003:
+                self.state = "Y"
+
+            elif self.num == 2  and self.cnt[self.num] > 0.001:
+                self.state = "G"
+
+            else:
+                self.state = "N"
+
+            if self.debug == True:
+                cv2.imshow("TL_Image", self.img_cropped)
+                cv2.imshow("TL_Image_r", self.r_sig)
+                cv2.imshow("TL_Image_g", self.g_sig)
+                cv2.waitKey(5)
+
+            self.get_logger().info("State = " + str(self.state) + " | " + "HSV = " + str(self.cnt))
+
+        except:
+            self.state = None
+            self.get_logger().warn("Unable to read frame")
 
 
     def tl_location_callback(self, msg):
         self.x1, self.y1, self.x2, self.y2 = map(int, msg.data)
         self.w = abs(self.x1 - self.x2)
         self.h = abs(self.y1 - self.y2)
-
-        try:
-            self.img_cropped = self.img[self.y1 : self.y1 + self.h, self.x1 : self.x1 + self.w]
-
-            self.r_sig, self.y_sig, self.g_sig = self.img_splitter(self.img_cropped, self.w)
-            self.color_detector(self.r_sig)
-
-            if self.debug == True:
-                cv2.imshow("TL_Image", self.r_sig)
-                cv2.waitKey(5)
-
-        except:
-            self.state = None
-            self.get_logger().warn("Unable to read frame")
 
 
     def img_splitter(self, img, width):
@@ -120,12 +150,39 @@ class tl_recognizer(Node):
 
         offset = np.array([[0, 128, 128]])
 
-
+        cnt = {'R':0, 'Y':0, 'G':0, 'N':0}
         for y in range(y_range):
             for x in range(x_range):
-                l, a, b = (img_lab[y][x] - offset).tolist()[0]
+                h, s, v = (img_lab[y][x] - offset).tolist()[0]
 
-                print(l, a, b)
+                if (
+                   (R_RANGE[0][0][0] <= h <= R_RANGE[0][0][1] or R_RANGE[0][1][0] <= h <= R_RANGE[0][1][1]) and 
+                    R_RANGE[1][0][0] <= s <= R_RANGE[1][0][1] and
+                    R_RANGE[2][0][0] <= v <= R_RANGE[2][0][1]         
+                    ):
+                    cnt['R'] += 1
+
+                elif (
+                    Y_RANGE[0][0][0] <= h <= Y_RANGE[0][0][1] and 
+                    Y_RANGE[1][0][0] <= s <= Y_RANGE[1][0][1] and
+                    Y_RANGE[2][0][0] <= v <= Y_RANGE[2][0][1]         
+                    ):
+                    cnt['Y'] += 1
+
+                elif (
+                    G_RANGE[0][0][0] <= h <= G_RANGE[0][0][1] and 
+                    G_RANGE[1][0][0] <= s <= G_RANGE[1][0][1] and
+                    G_RANGE[2][0][0] <= v <= G_RANGE[2][0][1]         
+                    ):
+                    cnt['G'] += 1
+
+                else:
+                    cnt['N'] += 1
+        
+        for key in cnt.keys():
+            cnt[key] = cnt[key] / sum(list(cnt.values()))
+
+        return cnt
 
 def main():
     rclpy.init()

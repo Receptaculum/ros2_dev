@@ -24,7 +24,7 @@ NODE_NAME = "camera_publisher"
 TOPIC_NAME = "camera_publisher"
 
 # 전송 주기
-PUBLISH_PERIOD = 0.01
+PUBLISH_PERIOD = 0.05
 
 ######################################################################################################
 
