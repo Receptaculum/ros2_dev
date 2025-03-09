@@ -1,4 +1,5 @@
 ### 시험용 ###
+# cv_recognizer node에서 발행한 topic 데이터 점검을 위한 코드
 
 import rclpy
 from rclpy.node import Node
