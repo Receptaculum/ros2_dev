@@ -32,6 +32,9 @@ FRAME_SIZE = [640, 480]
 # 도로 추출 영역 (가로, 세로)
 CUT_OFF = [[0, 639], [350, 475]]
 
+# 화면 출력 여부
+DEBUG = True
+
 ######################################################################################################
 
 
@@ -53,7 +56,7 @@ CUT_OFF = [[0, 639], [350, 475]]
 #######################################################################################################
 
 class path_preictor(Node):
-    def __init__(self, node_name, sub_topic_name : list, frame_size, cut_off):
+    def __init__(self, node_name, sub_topic_name : list, frame_size, cut_off, debug):
         super().__init__(node_name)
 
         self.qos_pub = QoSProfile( # Publisher QOS 설정
@@ -72,6 +75,7 @@ class path_preictor(Node):
         
         self.frame_size = frame_size
         self.cut_off = cut_off
+        self.debug = debug
 
         # Subscriber 선언
         self.subscriber_lane_1 = Subscriber(self, Float32MultiArray, sub_topic_name[0], qos_profile=self.qos_sub)
@@ -80,11 +84,68 @@ class path_preictor(Node):
 
         self.sync.registerCallback(self.path_prediction_callback)
 
+    def path_prediction_callback(self, msg1 : Float32MultiArray, msg2 : Float32MultiArray):
+        data_msg1 = self.hough_extractor(msg1)
+        center_msg1 = self.center_extractor(data_msg1)    
 
-    def path_prediction_callback(self, msg1, msg2):
+        background = np.zeros([self.frame_size[1], self.frame_size[0]])
+
+        for x, y, in center_msg1:
+                if 0 <= x < self.frame_size[0] and 0 <= y < self.frame_size[1]:
+                        background[y][x] = 1
+
+        cv2.imshow("Center", background)
+        cv2.waitKey(2)
+        
+
+    def center_extractor(self, data : dict):
+        return_val = []
+
+        if 'l' in data.keys() and 'r' in data.keys(): # l,r 둘 다 존재
+                data_l = sorted(data['l'], key = lambda x : x[1], reverse=True)
+                data_r = sorted(data['r'], key = lambda x : x[1], reverse=True)
+
+                for k in range(0, self.cut_off[1][1] - self.cut_off[1][0], 15):
+                        try:
+                               delta = abs(data_l[k][0] - data_r[k][0])
+                               return_val.append([int(data_l[k][0] + delta/2), data_l[k][1]])                        
+                        except Exception as e:
+                               self.get_logger().warn(f"error occured in center_extractor case 1 | {e}")
+                               pass
+
+        elif 'l' in data.keys() and not 'r' in data.keys(): # l만 존재
+                data_l = sorted(data['l'], key = lambda x : x[1], reverse=True)
+
+                for k in range(0, self.cut_off[1][1] - self.cut_off[1][0], 15):
+                        try:
+                               delta = 300
+                               return_val.append([int(data_l[k][0] + delta/2), data_l[k][1]])  
+                        except Exception as e:
+                               self.get_logger().warn(f"error occured in center_extractor case 2 | {e}")                               
+                               pass
+         
+        elif not 'l' in data.keys() and 'r' in data.keys(): # r만 존재
+                data_r = sorted(data['r'], key = lambda x : x[1], reverse=True)
+ 
+                for k in range(0, self.cut_off[1][1] - self.cut_off[1][0], 15):
+                        try:
+                               delta = 300
+                               return_val.append([int(data_r[k][0] - delta/2), data_r[k][1]])  
+                        except Exception as e:
+                               self.get_logger().warn(f"error occured in center_extractor case 3 | {e}")                               
+                               pass
+        
+        else:
+                self.get_logger().warn("error occured in center_extractor case 4")
+                pass
+
+        return return_val
+
+
+
+    def hough_extractor(self, msg : Float32MultiArray) -> dict:
         background = np.zeros([self.frame_size[1], self.frame_size[0]], dtype=np.uint8)
-        point = np.array(msg1.data, dtype=int).reshape(-1, 2)
-        point_new = []
+        point = np.array(msg.data, dtype=int).reshape(-1, 2)
 
         for x, y in point.tolist():
                 if (self.cut_off[0][0] <= x <= self.cut_off[0][1] and
@@ -92,48 +153,44 @@ class path_preictor(Node):
                         background[y][x] = 255
 
         data = cv2.HoughLinesP(background, 0.5, np.pi/720, threshold=4, minLineLength=5, maxLineGap=300)
-
         out = np.zeros([self.frame_size[1], self.frame_size[0]], dtype=np.uint8)
         
+        # return을 위한 dict 선언
+        return_data = dict()
+
 
         try:
+                # 왼쪽, 오른쪽 좌표값 저장
                 lhs = []
                 rhs = []
 
+                # 좌표값의 크기(길이) 저장
                 l_size = []
                 r_size = []
 
-                try:
-                        for line in data:
-                                x1, y1, x2, y2 = line[0]
+                for line in data:
+                        x1, y1, x2, y2 = line[0]
 
-                                try:
-                                        if min(x1, x2) < self.frame_size[0]/2:
-                                                lhs.append([x1, y1, x2, y2])
-                                                l_size.append(abs(y1-y2))
-                                except:
-                                       print("err1")
+                        if min(x1, x2) < self.frame_size[0]/2:
+                                lhs.append([x1, y1, x2, y2])
+                                l_size.append(abs(y1-y2))
 
-
-                                try:
-                                        if max(x1, x2) > self.frame_size[0]/2:
-                                                rhs.append([x1, y1, x2, y2])
-                                                r_size.append(abs(y1-y2))
-                                except:
-                                       print("err2")
-
-
-                except Exception as e:
-                        print("internal", e)
-                        pass
-
+                                
+                        if max(x1, x2) > self.frame_size[0]/2:
+                                rhs.append([x1, y1, x2, y2])
+                                r_size.append(abs(y1-y2))
       
                 l_line = lhs[l_size.index(max(l_size))]                
                 r_line = rhs[r_size.index(max(r_size))]
 
+                # 2개의 선이 중첩되는 문제를 제거하는 코드
                 if abs(max(l_line[0], l_line[2]) - max(r_line[0], r_line[2])) < 200:
-                       lhs = []
+                        if (l_line[0]-l_line[2])*(l_line[1]-l_line[3]) > 0:
+                                lhs = []
+                        else:
+                                rhs = []
 
+                # 왼쪽 직선 처리
                 if lhs != []:
                         y = np.array(list(range(0, self.frame_size[1], 1)))
                         x =  (l_line[0] - l_line[2])/(l_line[1] - l_line[3])*(y - l_line[1]) + l_line[0]
@@ -147,8 +204,9 @@ class path_preictor(Node):
                                       xy.append([int(x[n]), y[n]])
     
                         cv2.line(out, (xy[0][0], xy[0][1]), (xy[-1][0], xy[-1][1]), (255, ))
-                        # cv2.line(out, (l_line[0], l_line[1]), (l_line[2], l_line[3]), (255, ))
+                        return_data['l'] = xy
                 
+                # 오른쪽 직선 처리
                 if rhs != []:
                         y = np.array(list(range(0, self.frame_size[1], 1)))
                         x =  (r_line[0] - r_line[2])/(r_line[1] - r_line[3])*(y - r_line[1]) + r_line[0]
@@ -162,23 +220,21 @@ class path_preictor(Node):
                                       xy.append([int(x[n]), y[n]])
 
                         cv2.line(out, (xy[0][0], xy[0][1]), (xy[-1][0], xy[-1][1]), (255, ))
-                        # cv2.line(out, (r_line[0], r_line[1]), (r_line[2], r_line[3]), (255, ))
+                        return_data['r'] = xy
 
         except Exception as e:
-                print(e)
+                self.get_logger().warn(f"{e}")
                 pass
         
-        cv2.imshow("win", out)
-        cv2.waitKey(5)
+        if self.debug == True:
+                cv2.imshow("Hough", out)
+                cv2.waitKey(2)
 
-
-
-
-
+        return return_data
 
 def main():
     rclpy.init()
-    path_preictor_node = path_preictor(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, CUT_OFF)
+    path_preictor_node = path_preictor(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, CUT_OFF, DEBUG)
     rclpy.spin(path_preictor_node)
 
     path_preictor_node.destroy_node()
