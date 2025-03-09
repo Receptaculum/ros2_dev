@@ -90,12 +90,14 @@ class path_preictor(Node):
 
         background = np.zeros([self.frame_size[1], self.frame_size[0]])
 
-        for x, y, in center_msg1:
-                if 0 <= x < self.frame_size[0] and 0 <= y < self.frame_size[1]:
-                        background[y][x] = 1
+        if self.debug == True:
+                for x, y, in center_msg1:
+                        if 0 <= x < self.frame_size[0] and 0 <= y < self.frame_size[1]:
+                                background[y][x] = 1
 
-        cv2.imshow("Center", background)
-        cv2.waitKey(2)
+                cv2.imshow("Center", background)
+                cv2.waitKey(2)
+        
         
 
     def center_extractor(self, data : dict):
