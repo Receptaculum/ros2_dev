@@ -81,6 +81,7 @@ def main():
     communication_node = ros_uart_communicator(NODE_NAME, PORT_NAME, BAUD_RATE, SUB_TOPIC_NAME)
     rclpy.spin(communication_node)
 
+    communication_node.destroy_node()
     rclpy.shutdown()
 
 

@@ -13,6 +13,7 @@ import cv_bridge
 import torch
 
 import os
+import time
 
 
 ## < Parameter> #####################################################################################
@@ -33,7 +34,7 @@ SUB_TOPIC_NAME = "camera_publisher"
 PT_NAME = "car.pt"
 
 # CV 처리 영상 출력 여부
-DEBUG = False
+DEBUG = True
 
 ######################################################################################################
 

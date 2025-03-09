@@ -63,6 +63,7 @@ def main():
     debugger_node = communication_debugger(NODE_NAME, TOPIC_NAME, TIMER_PERIOD)
     rclpy.spin(debugger_node)
 
+    debugger_node.destroy_node()
     rclpy.shutdown()
 
 if __name__ == "__main__":

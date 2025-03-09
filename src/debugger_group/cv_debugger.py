@@ -19,7 +19,7 @@ import numpy as np
 ## < Parameter> #####################################################################################
 
 # 노드 이름
-NODE_NAME = "path_predictor"
+NODE_NAME = "cv_debugger"
 
 # 토픽 이름
 TOPIC_NAME = None
@@ -66,7 +66,6 @@ class path_preictor(Node):
         img = cv2.polylines(img_background, [np.array(msg.data, dtype=int).reshape(-1, 2)], True, (255, ), 1)
         cv2.imshow("lane", img)
         cv2.waitKey(5)
-        print(np.array(msg.data, dtype=int).reshape(-1, 2))
 
     def traffic_callback(self, msg):
         img_background = np.zeros([self.frame_size[1], self.frame_size[0]])

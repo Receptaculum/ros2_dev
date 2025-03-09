@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import String
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
 from message_filters import Subscriber, ApproximateTimeSynchronizer
 
@@ -32,7 +33,7 @@ SUB_TOPIC_NAME = ["cv_tl", "camera_publisher"]
 FRAME_SIZE = [640, 480]
 
 # CV 처리 영상 출력 여부
-DEBUG = True
+DEBUG = False
 
 ######################################################################################################
 
@@ -65,7 +66,7 @@ G_RANGE = [[[45, 85]], [[8, 255]], [[100, 255]]]
 
 
 class tl_recognizer(Node):
-    def __init__(self, node_name, sub_topic_name, frame_size, debug):
+    def __init__(self, node_name, sub_topic_name, frame_size, debug, topic_name):
         super().__init__(node_name)
 
         self.qos_pub = QoSProfile( # Publisher QOS 설정
@@ -88,6 +89,10 @@ class tl_recognizer(Node):
 
         self.subscriber_tl_location = self.create_subscription(Float32MultiArray, sub_topic_name[0], self.tl_location_callback, self.qos_sub)
         self.subscriber_frame = self.create_subscription(Image, sub_topic_name[1], self.frame_callback, self.qos_sub)
+
+        self.publisher = self.create_publisher(String, topic_name, self.qos_pub)
+
+        self.msg = String()
 
 
     def frame_callback(self, msg):
@@ -120,9 +125,12 @@ class tl_recognizer(Node):
             if self.debug == True:
                 cv2.imshow("TL_Image", self.img_cropped)
                 cv2.imshow("TL_Image_r", self.r_sig)
+                cv2.imshow("TL_Image_y", self.y_sig)
                 cv2.imshow("TL_Image_g", self.g_sig)
                 cv2.waitKey(5)
 
+            self.msg.data = self.state
+            self.publisher.publish(self.msg)
             self.get_logger().info("State = " + str(self.state) + " | " + "HSV = " + str(self.cnt))
 
         except:
@@ -183,12 +191,16 @@ class tl_recognizer(Node):
             cnt[key] = cnt[key] / sum(list(cnt.values()))
 
         return cnt
+    
+    def shutdown(self):
+        cv2.destroyAllWindows()
 
 def main():
     rclpy.init()
-    tl_recognizer_node = tl_recognizer(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, DEBUG)
+    tl_recognizer_node = tl_recognizer(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, DEBUG, TOPIC_NAME)
     rclpy.spin(tl_recognizer_node)
 
+    tl_recognizer_node.shutdown()
     tl_recognizer_node.destroy_node()
     rclpy.shutdown()
 
