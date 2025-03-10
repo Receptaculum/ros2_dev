@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray, Int8
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
 
 from message_filters import Subscriber, ApproximateTimeSynchronizer
@@ -11,6 +11,7 @@ import cv_bridge
 
 import numpy as np
 
+import math
 
 ## < Parameter> #####################################################################################
 
@@ -18,7 +19,7 @@ import numpy as np
 NODE_NAME = "path_predictor"
 
 # 발행 토픽 이름
-TOPIC_NAME = None
+TOPIC_NAME = "path_angle"
 
 # 구독 토픽 이름 (2개 | lane1, lane2)
 SUB_TOPIC_NAME = ["cv_lane_2", "cv_lane_2"]
@@ -56,7 +57,7 @@ DEBUG = True
 #######################################################################################################
 
 class path_preictor(Node):
-    def __init__(self, node_name, sub_topic_name : list, frame_size, cut_off, debug):
+    def __init__(self, node_name, sub_topic_name : list, frame_size, cut_off, debug, topic_name):
         super().__init__(node_name)
 
         self.qos_pub = QoSProfile( # Publisher QOS 설정
@@ -84,20 +85,48 @@ class path_preictor(Node):
 
         self.sync.registerCallback(self.path_prediction_callback)
 
+        # Publisher 선언
+        self.publisher = self.create_publisher(Int8, topic_name, self.qos_pub)
+        self.msg = Int8()
+
     def path_prediction_callback(self, msg1 : Float32MultiArray, msg2 : Float32MultiArray):
         data_msg1 = self.hough_extractor(msg1)
-        center_msg1 = self.center_extractor(data_msg1)    
+        center_msg1 = self.center_extractor(data_msg1)
+        angle = int(self.angle_calculator(center_msg1)*180/math.pi)
 
-        background = np.zeros([self.frame_size[1], self.frame_size[0]])
+        self.get_logger().info(f"Angle = {angle} [deg]")
+        self.msg.data = angle
+        self.publisher.publish(self.msg)   
 
         if self.debug == True:
+                background = np.zeros([self.frame_size[1], self.frame_size[0]])
+                
                 for x, y, in center_msg1:
                         if 0 <= x < self.frame_size[0] and 0 <= y < self.frame_size[1]:
                                 background[y][x] = 1
 
                 cv2.imshow("Center", background)
                 cv2.waitKey(2)
+
         
+
+    def angle_calculator(self, data : list):
+        try:
+                p1 = data[0]
+                p2 = data[-1]
+                self.mem_p1 = data[0]
+                self.mem_p2 = data[-1]
+
+        except:
+                p1 = self.mem_p1
+                p2 = self.mem_p2
+
+
+        try:
+                return math.atan((p1[0]-p2[0])/(p1[1]-p2[1]))
+        
+        except:
+                return math.pi/2 
         
 
     def center_extractor(self, data : dict):
@@ -236,7 +265,7 @@ class path_preictor(Node):
 
 def main():
     rclpy.init()
-    path_preictor_node = path_preictor(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, CUT_OFF, DEBUG)
+    path_preictor_node = path_preictor(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, CUT_OFF, DEBUG, TOPIC_NAME)
     rclpy.spin(path_preictor_node)
 
     path_preictor_node.destroy_node()
