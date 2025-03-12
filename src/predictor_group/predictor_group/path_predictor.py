@@ -30,6 +30,9 @@ DEBUG = False
 # 영상 크기 (가로, 세로)
 FRAME_SIZE = [640, 480]
 
+# 자동차 중앙
+CAR_CENTER = [320, 480]
+
 # 도로 추출 영역 (가로, 세로)
 CUT_OFF = [[0, 639], [350, 475]]
 
@@ -54,7 +57,7 @@ CUT_OFF = [[0, 639], [350, 475]]
 #######################################################################################################
 
 class path_preictor(Node):
-    def __init__(self, node_name, sub_topic_name : list, frame_size, cut_off, debug, topic_name):
+    def __init__(self, node_name, sub_topic_name : list, frame_size, cut_off, debug, topic_name, car_center):
         super().__init__(node_name)
 
         self.qos_pub = QoSProfile( # Publisher QOS 설정
@@ -71,6 +74,8 @@ class path_preictor(Node):
                 depth=1
                 )
         
+        self.car_center = car_center
+        
         self.frame_size = frame_size
         self.cut_off = cut_off
         self.debug = debug
@@ -86,14 +91,28 @@ class path_preictor(Node):
         self.publisher = self.create_publisher(Int8, topic_name, self.qos_pub)
         self.msg = Int8()
 
+        # Smooth Filter를 위한 저장소
+        self.reg = []
+
+        # 좌표 저장을 위한 공간
+        self.reg_x = []
+
     def path_prediction_callback(self, msg1 : Float32MultiArray, msg2 : Float32MultiArray):
-        data_msg1 = self.hough_extractor(msg1)
+        #data_msg1 = self.hough_extractor(msg1)
+        data_msg1 = self.hough_extractor_p(msg1)
+
         center_msg1 = self.center_extractor(data_msg1)
         angle = int(self.angle_calculator(center_msg1)*180/math.pi)
 
+        angle = self.smooth_filter(angle)
+
         self.get_logger().info(f"Angle = {angle} [deg]")
         self.msg.data = angle
-        self.publisher.publish(self.msg)   
+
+        self.publisher.publish(self.msg)
+
+        print(self.position_calculator(angle))
+
 
         if self.debug == True:
                 background = np.zeros([self.frame_size[1], self.frame_size[0]])
@@ -106,7 +125,29 @@ class path_preictor(Node):
                 cv2.waitKey(2)
 
         
+    def smooth_filter(self, data):
+        self.reg.append(data)
 
+        if(len(self.reg) <= 10):
+               return 0
+        else:
+                avg = int(sum(self.reg)/len(self.reg))
+                self.reg.pop(0)
+
+                return avg
+
+    def position_calculator(self, angle):
+        x = -100 * np.tan(angle*math.pi/180) + self.car_center[0]
+        self.reg_x.append(x)
+
+        if len(self.reg_x) == 3:
+                ret_data = self.reg_x.copy()
+                self.reg_x.pop(0)
+
+                return ret_data
+        else:
+                return None
+               
     def angle_calculator(self, data : list):
         try:
                 p1 = data[0]
@@ -171,7 +212,7 @@ class path_preictor(Node):
 
 
 
-    def hough_extractor(self, msg : Float32MultiArray) -> dict:
+    def hough_extractor_p(self, msg : Float32MultiArray) -> dict:
         background = np.zeros([self.frame_size[1], self.frame_size[0]], dtype=np.uint8)
         point = np.array(msg.data, dtype=int).reshape(-1, 2)
 
@@ -181,6 +222,7 @@ class path_preictor(Node):
                         background[y][x] = 255
 
         data = cv2.HoughLinesP(background, 0.5, np.pi/720, threshold=4, minLineLength=5, maxLineGap=300)
+
         out = np.zeros([self.frame_size[1], self.frame_size[0]], dtype=np.uint8)
         
         # return을 위한 dict 선언
@@ -259,10 +301,122 @@ class path_preictor(Node):
                 cv2.waitKey(2)
 
         return return_data
+    
+    
+
+    def hough_extractor(self, msg : Float32MultiArray) -> dict:
+        background = np.zeros([self.frame_size[1], self.frame_size[0]], dtype=np.uint8)
+        point = np.array(msg.data, dtype=int).reshape(-1, 2)
+
+        for x, y in point.tolist():
+                if (self.cut_off[0][0] <= x <= self.cut_off[0][1] and
+                    self.cut_off[1][0] <= y <= self.cut_off[1][1]):
+                        background[y][x] = 255
+
+        tmp = cv2.HoughLines(background, 0.5, np.pi/720, threshold=3)
+        data = []
+        if tmp is not None:
+                for line in tmp:
+                        r, theta = line[0]
+
+                        a = np.cos(theta)
+                        b = np.sin(theta)
+
+                        x0 = r*a
+                        y0 = r*b
+
+                        self.x0 = x0
+                        self.y0 = y0
+
+                        x1 = x0 + self.frame_size[0]*b
+                        y1 = y0 - self.frame_size[0]*a
+
+                        x2 = x0 - self.frame_size[0]*b
+                        y2 = y0 + self.frame_size[0]*a
+
+                        data.append([[x1, y1, x2, y2]])
+                        
+        out = np.zeros([self.frame_size[1], self.frame_size[0]], dtype=np.uint8)
+        
+        # return을 위한 dict 선언
+        return_data = dict()
+
+
+        try:
+                # 왼쪽, 오른쪽 좌표값 저장
+                lhs = []
+                rhs = []
+
+                for line in data:
+                        x1, y1, x2, y2 = line[0]
+
+                        if y1 > self.y0:
+                                if x1 < self.x0:
+                                      lhs.append([x1, y1, x2, y2])
+
+                                if x1 > self.x0:
+                                      rhs.append([x1, y1, x2, y2])
+                               
+                        if y2 > self.y0:
+                                if x2 < self.x0:
+                                      lhs.append([x1, y1, x2, y2])
+
+                                if x2 > self.x0:
+                                      rhs.append([x1, y1, x2, y2])
+
+      
+                l_line = lhs[0]                
+                r_line = rhs[0]
+
+                # 왼쪽 직선 처리
+                if lhs != []:
+                        y = np.array(list(range(int(self.frame_size[1]/2), self.frame_size[1], 1)))
+                        x =  (l_line[0] - l_line[2])/(l_line[1] - l_line[3])*(y - l_line[1]) + l_line[0]
+
+                        y = y.tolist()
+                        x = x.tolist()
+                        print("left")
+                        xy = []
+                        for n in range(len(x)):
+                                if x[n] >= 0:
+                                      xy.append([int(x[n]), y[n]])
+    
+                        cv2.line(out, (xy[0][0], xy[0][1]), (xy[-1][0], xy[-1][1]), (255, ))
+                        return_data['l'] = xy
+
+                
+                # 오른쪽 직선 처리
+                if rhs != []:
+                        y = np.array(list(range(int(self.frame_size[1]/2), self.frame_size[1], 1)))
+                        x =  (r_line[0] - r_line[2])/(r_line[1] - r_line[3])*(y - r_line[1]) + r_line[0]
+
+                        y = y.tolist()
+                        x = x.tolist()
+                        print("right")
+                        xy = []
+                        for n in range(len(x)):
+                                if x[n] >= 0:
+                                      xy.append([int(x[n]), y[n]])
+
+                        cv2.line(out, (xy[0][0], xy[0][1]), (xy[-1][0], xy[-1][1]), (255, ))
+                        return_data['r'] = xy
+
+
+        except Exception as e:
+                self.get_logger().warn(f"{e}")
+                pass
+        
+        if self.debug == True:
+                cv2.imshow("Hough", out)
+                cv2.waitKey(2)
+
+        return return_data
+    
+           
 
 def main():
     rclpy.init()
-    path_preictor_node = path_preictor(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, CUT_OFF, DEBUG, TOPIC_NAME)
+    path_preictor_node = path_preictor(NODE_NAME, SUB_TOPIC_NAME, FRAME_SIZE, CUT_OFF, DEBUG, TOPIC_NAME, CAR_CENTER)
     rclpy.spin(path_preictor_node)
 
     path_preictor_node.destroy_node()
